@@ -1,0 +1,11 @@
+module.exports.HTTP_OK = 200;
+module.exports.HTTP_CREATED = 201;
+module.exports.HTTP_NO_CONTENT = 204;
+module.exports.HTTP_BAD_REQUEST = 400;
+module.exports.HTTP_UNAUTHORIZED = 401;
+module.exports.HTTP_FORBIDDEN = 403;
+module.exports.HTTP_NOT_FOUND = 404;
+module.exports.HTTP_METHOD_NOT_ALLOWED = 405;
+module.exports.HTTP_REQUEST_TIMEOUT = 408;
+module.exports.HTTP_EXPECTATION_FAILED = 417;
+module.exports.HTTP_INTERNAL_SERVER_ERROR = 500;
