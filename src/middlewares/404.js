@@ -1,5 +1,5 @@
 const { logger } = require('../utils/logger');
-const AppError = require('../utils/errorHandler');
+const { AppError } = require('../utils/errorHandler');
 const { HTTP_NOT_FOUND } = require('../utils/httpStatusCodes');
 
 module.exports.error404 = (req, res, next) => {

@@ -1,5 +1,5 @@
 const { INTERNAL_SERVER_ERROR_MSG } = require('../utils/constants');
-const AppError = require('../utils/errorHandler');
+const { AppError } = require('../utils/errorHandler');
 const { HTTP_INTERNAL_SERVER_ERROR } = require('../utils/httpStatusCodes');
 
 module.exports.errorHandler = (err, req, res, next) => {
