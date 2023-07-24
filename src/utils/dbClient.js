@@ -1,6 +1,6 @@
 const { pool } = require('../config/database');
 const { DEFAULT_ERR_MSG } = require('./constants');
-const AppError = require('./errorHandler');
+const { AppError } = require('./errorHandler');
 const { logger } = require('./logger');
 
 module.exports.client = async (query, params) => {

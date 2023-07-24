@@ -1,6 +1,6 @@
 const { logger } = require('./logger');
 const { DEFAULT_ERR_MSG } = require('./constants');
-const AppError = require('./errorHandler');
+const { AppError } = require('./errorHandler');
 
 module.exports.withTryCatch = async (fn) => {
     try {
