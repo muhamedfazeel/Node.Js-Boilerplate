@@ -1,4 +1,8 @@
-const { HTTP_OK } = require('../../utils/httpStatusCodes');
+const {
+  HTTP_OK,
+  HTTP_CREATED
+} = require('../../utils/httpStatusCodes');
+const { USER_CREATED_MESSAGE } = require('../../utils/responseMessages');
 const userService = require('./userService');
 
 exports.login = async (req, res, next) => {
@@ -19,7 +23,7 @@ exports.registerUser = async (req, res, next) => {
     password,
     confirmPassword
   } = req.body;
-  const user = await userService
+  const userId = await userService
     .userSignup(
       name,
       email,
@@ -27,4 +31,7 @@ exports.registerUser = async (req, res, next) => {
       password,
       confirmPassword
     );
+  if (userId) {
+    res.status(HTTP_CREATED).json({ message: USER_CREATED_MESSAGE });
+  }
 };
