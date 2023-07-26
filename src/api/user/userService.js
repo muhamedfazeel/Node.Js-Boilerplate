@@ -6,7 +6,7 @@ const {
 const { logger } = require('../../utils/logger');
 const { AppError } = require('../../utils/errorHandler');
 const { HTTP_UNAUTHORIZED, HTTP_BAD_REQUEST, HTTP_EXPECTATION_FAILED } = require('../../utils/httpStatusCodes');
-const { INVALID_USERNAME_PASSWORD_ERR_MSG } = require('../../utils/constants');
+const { INVALID_USERNAME_PASSWORD_ERR_MSG } = require('../../utils/responseMessages');
 
 exports.login = async (email, username, password) => {
   try {
