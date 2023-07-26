@@ -1,10 +1,10 @@
 const { pool } = require('../../config/database');
 const { DEFAULT_ERR_MSG } = require('../../utils/constants');
+const { runQuery } = require('../../utils/dbClient');
 const { AppError } = require('../../utils/errorHandler');
 const { logger } = require('../../utils/logger');
 
 exports.getUserByUsernameOrEmail = async (email, username) => {
-  const client = await pool.connect();
   const query = `
     SELECT 
       id,
@@ -16,7 +16,7 @@ exports.getUserByUsernameOrEmail = async (email, username) => {
     WHERE email = $1 OR username = $2;
   `;
   try {
-    const result = await client.query(
+    const result = await runQuery(
       query,
       [email, username]
     );
@@ -24,8 +24,6 @@ exports.getUserByUsernameOrEmail = async (email, username) => {
   } catch (error) {
     logger.error(DEFAULT_ERR_MSG, error);
     new AppError(error);
-  } finally {
-    client.release();
   }
 };
 
@@ -65,6 +63,7 @@ exports.createNewUser = async (name, email, username, password, roles) => {
       [result?.rows[0]?.id]
     );
     await client.query('COMMIT');
+    return result.rows[0].id;
   } catch (error) {
     await client.query('ROLLBACK');
     logger.error(DEFAULT_ERR_MSG, error);
