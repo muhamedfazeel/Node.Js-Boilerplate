@@ -2,26 +2,28 @@ const {
   hashSync,
   compareSync
 } = require('bcrypt');
-const { AppError } = require('./errorHandler');
-const { HTTP_BAD_REQUEST } = require('./httpStatusCodes');
-const { logger } = require('./logger');
 const { SALT_ROUNDS } = require('./constants');
-const { withTryCatch } = require('./tryCatchFn');
-
-const saltRounds = SALT_ROUNDS;
+const { HTTP_BAD_REQUEST } = require('./httpStatusCodes');
+const { AppError } = require('./errorHandler');
+const { logger } = require('./logger');
 
 module.exports.encrypt = (password) => {
-  return hashSync(password, saltRounds);
+  return hashSync(password, SALT_ROUNDS);
 };
 
 module.exports.compare = (password, hash) => {
   return compareSync(password, hash);
 };
 
-module.exports.decodePassword = withTryCatch(async (encodedPassword) => {
-  const decodedPassword = Buffer.from(encodedPassword, 'base64').toString('utf-8');
-  return decodedPassword;
-},
-  'Invalid string provided',
-  HTTP_BAD_REQUEST
-);
+module.exports.decodePassword = async (encodedPassword) => {
+  try {
+    const decodedPassword = Buffer.from(encodedPassword, 'base64').toString('utf-8');
+    return decodedPassword;
+  } catch (error) {
+    logger.error(error);
+    new AppError(
+      'Invalid string provided',
+      HTTP_BAD_REQUEST
+    );
+  }
+};
