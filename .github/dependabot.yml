@@ -5,7 +5,14 @@
 
 version: 2
 updates:
-    - package-ecosystem: '' # See documentation for possible values
+    # Version update for npm
+    - package-ecosystem: 'npm'
       directory: '/' # Location of package manifests
       schedule:
-          interval: 'weekly'
+          interval: 'daily'
+
+    # Version updata for Docker
+    - package-ecosystem: "docker"
+      directory: "/" # Location of Dockerfile
+      schedule:
+        interval: "weekly"
