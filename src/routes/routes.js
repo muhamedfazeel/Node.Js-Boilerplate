@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const statusRouter = require('../api/status/route/statusRoutes');
+const statusRouter = require('../api/status/statusRoute');
 
 router.use('/status', statusRouter);
 
