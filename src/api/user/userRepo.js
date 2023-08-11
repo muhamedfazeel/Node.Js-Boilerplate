@@ -27,7 +27,7 @@ exports.getUserByUsernameOrEmail = async (email, username) => {
   }
 };
 
-exports.createNewUser = async (name, email, username, password, roles) => {
+exports.createNewUser = async ({ name, email, username, password, roles }) => {
   const client = await pool.connect();
   const insertQuery = `
     INSERT INTO users (

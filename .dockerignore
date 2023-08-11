@@ -1,5 +1,7 @@
-.scannerwork/
-node_modules/
-logs/
 npm-debug.log
 local.env
+
+.github/
+.scannerwork/
+logs/
+node_modules/

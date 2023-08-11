@@ -24,13 +24,13 @@ exports.registerUser = async (req, res, next) => {
     confirmPassword
   } = req.body;
   const userId = await userService
-    .userSignup(
+    .userSignup({
       name,
       email,
       username,
       password,
       confirmPassword
-    );
+    });
   if (userId) {
     res.status(HTTP_CREATED).json({ message: USER_CREATED_MESSAGE });
   }

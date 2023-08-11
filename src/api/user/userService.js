@@ -36,29 +36,27 @@ exports.login = async (email, username, password) => {
   }
 };
 
-exports.userSignup = async (name, email, username, password, confirmPassword, roles) => {
-  if (password != confirmPassword) {
-    new AppError('Passwords not matched', HTTP_BAD_REQUEST);
+exports.userSignup = async ({ name, email, username, password, roles }) => {
+  password = decodePassword(password);
+  const encryptedPassword = encrypt(password);
+  const userId = await userRepo.createNewUser({
+    name,
+    email,
+    username,
+    password: encryptedPassword,
+    roles
+  });
+  if (userId) {
+    return userId;
   } else {
-    password = decodePassword(password);
-    const encryptedPassword = encrypt(password);
-    const userId = await userRepo.createNewUser(
-      name,
-      email,
-      username,
-      encryptedPassword,
-      roles
+    new AppError(
+      'Failed to create new user',
+      HTTP_EXPECTATION_FAILED
     );
-    if (userId) {
-      return userId;
-    } else {
-      new AppError(
-        'Failed to create new user',
-        HTTP_EXPECTATION_FAILED
-      );
-    }
   }
 };
+
+exports.updateUser = async({ name, email, password, roles })
 
 const invalidUsernamePassword = () => {
   new AppError(
