@@ -5,7 +5,7 @@ const {
 } = require('../../auth/jwt');
 const { logger } = require('../../utils/logger');
 const { AppError } = require('../../utils/errorHandler');
-const { HTTP_UNAUTHORIZED, HTTP_BAD_REQUEST, HTTP_EXPECTATION_FAILED } = require('../../utils/httpStatusCodes');
+const { HTTP_UNAUTHORIZED, HTTP_EXPECTATION_FAILED } = require('../../utils/httpStatusCodes');
 const { INVALID_USERNAME_PASSWORD_ERR_MSG } = require('../../utils/responseMessages');
 
 exports.login = async (email, username, password) => {
@@ -36,7 +36,7 @@ exports.login = async (email, username, password) => {
   }
 };
 
-exports.userSignup = async ({ name, email, username, password, roles }) => {
+exports.userSignup = async ({ name, email, username, password, roles, user }) => {
   password = decodePassword(password);
   const encryptedPassword = encrypt(password);
   const userId = await userRepo.createNewUser({
@@ -44,7 +44,8 @@ exports.userSignup = async ({ name, email, username, password, roles }) => {
     email,
     username,
     password: encryptedPassword,
-    roles
+    roles,
+    user
   });
   if (userId) {
     return userId;
@@ -56,7 +57,49 @@ exports.userSignup = async ({ name, email, username, password, roles }) => {
   }
 };
 
-exports.updateUser = async({ name, email, password, roles })
+exports.fetchAllUsers = async () => {
+  const users = await userRepo.fetchUsers();
+  return users;
+};
+
+exports.fetchUserById = async (userId) => {
+  const user = await userRepo.fetchUserById(userId);
+  return user;
+};
+
+exports.updateUser = async ({ name, email, password, roles, user, userId }) => {
+  password = password ? decodePassword(password) : password;
+  const id = await userRepo.updateUser({
+    name,
+    email,
+    password,
+    roles,
+    user,
+    userId
+  });
+  if (id) {
+    return id;
+  } else {
+    new AppError(
+      'Failed to update the user',
+      HTTP_EXPECTATION_FAILED
+    );
+  }
+};
+
+exports.deleteUser = async (userId) => {
+  const row = await userRepo.deleteUser({
+    userId
+  });
+  if (row) {
+    return row;
+  } else {
+    new AppError(
+      'Failed to update the user',
+      HTTP_EXPECTATION_FAILED
+    );
+  }
+};
 
 const invalidUsernamePassword = () => {
   new AppError(

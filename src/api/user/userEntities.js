@@ -19,3 +19,7 @@ module.exports.updateUserSchema = Joi.object({
   email: Joi.string().email().optional(),
   password: Joi.string().min(8).max(20).required()
 });
+
+module.exports.reqParam = Joi.object({
+  userId: Joi.number().required()
+});
