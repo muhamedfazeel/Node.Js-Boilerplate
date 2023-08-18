@@ -1,8 +1,5 @@
-const { pool } = require('../../config/database');
-const { DEFAULT_ERR_MSG } = require('../../utils/responseMessages');
 const { runQuery } = require('../../utils/dbClient');
 const { AppError } = require('../../utils/errorHandler');
-const { logger } = require('../../utils/logger');
 const { HTTP_NOT_FOUND } = require('../../utils/httpStatusCodes');
 
 exports.getUserByUsernameOrEmail = async (email, username) => {
@@ -16,20 +13,14 @@ exports.getUserByUsernameOrEmail = async (email, username) => {
     FROM user
     WHERE email = $1 OR username = $2 AND is_deleted = FALSE;
   `;
-  try {
-    const result = await runQuery(
-      query,
-      [email, username]
-    );
-    return result.rows[0];
-  } catch (error) {
-    logger.error(DEFAULT_ERR_MSG, error);
-    new AppError(error);
-  }
+  const result = await runQuery(
+    query,
+    [email, username]
+  );
+  return result.rows[0];
 };
 
 exports.createNewUser = async ({ name, email, username, password, roles, user }) => {
-  const client = await pool.connect();
   const query = `
     INSERT INTO users (
       name,
@@ -42,29 +33,21 @@ exports.createNewUser = async ({ name, email, username, password, roles, user })
     ) VALUES ($1, $2, $3, $4, $5, $6, NOW)
     RETURNING id;
   `;
-  try {
-    const result = await client.query(
-      query,
-      [
-        name,
-        email,
-        username,
-        password,
-        roles,
-        user
-      ]
-    );
-    return result.rows[0].id;
-  } catch (error) {
-    logger.error(DEFAULT_ERR_MSG, error);
-    new AppError(error);
-  } finally {
-    client.release();
-  }
+  const result = await runQuery(
+    query,
+    [
+      name,
+      email,
+      username,
+      password,
+      roles,
+      user
+    ]
+  );
+  return result?.rows[0]?.id || null;
 };
 
 exports.fetchUsers = async () => {
-  const client = await pool.connect();
   const query = `
     SELECT
       id,
@@ -75,42 +58,26 @@ exports.fetchUsers = async () => {
       created_datetime
     WHERE is_deleted = FALSE;
   `;
-  try {
-    const users = await client.query(query);
-    return users?.rows || {};
-  } catch (error) {
-    logger.error(DEFAULT_ERR_MSG, error);
-    new AppError(error);
-  } finally {
-    client.release();
-  }
+  const users = await runQuery(query);
+  return users?.rows || {};
 };
 
 exports.fetchUserById = async (userId) => {
-  const client = await pool.connect();
   const query = `
     SELECT
       id,
       roles
     WHERE id = $1 AND is_deleted = FALSE;
   `;
-  try {
-    const user = await client.query(query, [userId]);
-    if (user?.rows?.length) {
-      return user.rows[0];
-    } else {
-      userNotFoundError();
-    }
-  } catch (error) {
-    logger.error(error.message || DEFAULT_ERR_MSG, error);
-    new AppError(error);
-  } finally {
-    client.release();
+  const user = await runQuery(query, [userId]);
+  if (user?.rows?.length) {
+    return user.rows[0];
+  } else {
+    userNotFoundError();
   }
 };
 
 exports.updateUser = async ({ name, email, password, roles, user, userId }) => {
-  const client = await pool.connect();
   const query = `
     UPDATE users SET
       name = CASE
@@ -134,53 +101,38 @@ exports.updateUser = async ({ name, email, password, roles, user, userId }) => {
     WHERE id = $6 AND is_deleted = FALSE
     RETURNING id;
   `;
-  try {
-    const { rowCount } = await client.query(
-      query,
-      [
-        name,
-        email,
-        password,
-        roles,
-        user,
-        userId
-      ]
-    );
-    if (rowCount) {
-      return true;
-    } else {
-      userNotFoundError();
-    }
-  } catch (error) {
-    logger.error(error.message || DEFAULT_ERR_MSG, error);
-    new AppError(error);
-  } finally {
-    client.release();
+  const { rowCount } = await runQuery(
+    query,
+    [
+      name,
+      email,
+      password,
+      roles,
+      user,
+      userId
+    ]
+  );
+  if (rowCount) {
+    return true;
+  } else {
+    userNotFoundError();
   }
 };
 
 exports.deleteUser = async (userId) => {
-  const client = await pool.connect();
   const query = `
     UPDATE users SET
       is_deleted = TRUE
     WHERE id = $1 AND is_deleted = FALSE;
   `;
-  try {
-    const { rowCount } = await client.query(query, [userId]);
-    if (rowCount) {
-      return rowCount;
-    } else {
-      userNotFoundError();
-    }
-  } catch (error) {
-    logger.error(error.message || DEFAULT_ERR_MSG, error);
-    new AppError(error);
-  } finally {
-    client.release();
+  const { rowCount } = await runQuery(query, [userId]);
+  if (rowCount) {
+    return rowCount;
+  } else {
+    userNotFoundError();
   }
 };
 
 const userNotFoundError = () => {
-  throw new Error('User not found', HTTP_NOT_FOUND);
+  new AppError('User not found', HTTP_NOT_FOUND);
 };
