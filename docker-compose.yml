@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+    nodejs-db:
+        image: postgres:14.1-alpine
+        ports:
+            - 5678:5432
+        expose:
+            - 5678
+        environment:
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASS}
+            POSTGRES_DB: ${DB_NAME}
+        volumes:
+            - ./apps/db/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+            - ./postgres-data:/var/lib/postgresql/data
+        networks:
+            - nodejs-net
+    web:
+        build: .
+        image: nodejs-bp:latest
+        ports:
+            - ${PORT}:${PORT}
+        networks:
+            - nodejs-net
+        environment:
+            - DB_HOST=${DB_HOST}
+            - DB_PORT=${DB_PORT}
+            - DB_USER=${DB_USER}
+            - DB_PASSWORD=${DB_PASS}
+            - DB_NAME=${DB_NAME}
+        expose:
+            - ${PORT}
+        links:
+            - nodejs-db
+        command: |
+            npm run start
+
+networks:
+    nodejs-net:
