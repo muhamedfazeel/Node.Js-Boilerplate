@@ -1,10 +1,10 @@
 const { Pool } = require('pg');
-const { DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER } = require('./constants');
+const config = require('./config');
 
 module.exports.pool = new Pool({
-    user: DB_USER,
-    host: DB_HOST,
-    database: DB_NAME,
-    password: DB_PASS,
-    port: DB_PORT,
+    user: config.DB_USER,
+    host: config.DB_HOST,
+    database: config.DB_NAME,
+    password: config.DB_PASS,
+    port: config.DB_PORT,
 });

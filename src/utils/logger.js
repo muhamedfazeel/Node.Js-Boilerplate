@@ -1,9 +1,9 @@
 const { createLogger, transports, format } = require('winston');
-const { PROJECT } = require('./constants');
+const config = require('../config/config');
 
 const logFormat = format.combine(
     format.colorize(),
-    format.label({ label: PROJECT }),
+    format.label({ label: config.PROJECT }),
     format.timestamp({ format: 'MM-DD-YYYY HH:mm:ss' }),
     format.printf(({ level, message, label, timestamp, ...info }) => {
         let log = `${timestamp} [${label}] [${level}]`;

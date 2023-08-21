@@ -1,5 +1,5 @@
 const { pool } = require('../config/database');
-const { DEFAULT_ERR_MSG } = require('./constants');
+const { DEFAULT_ERR_MSG } = require('./messages');
 const { AppError } = require('./errorHandler');
 const { logger } = require('./logger');
 
