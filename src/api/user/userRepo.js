@@ -10,7 +10,7 @@ exports.getUserByUsernameOrEmail = async (email, username) => {
       email,
       username,
       password
-    FROM user
+    FROM public.user
     WHERE email = $1 OR username = $2 AND is_deleted = FALSE;
   `;
   const result = await runQuery(
@@ -22,7 +22,7 @@ exports.getUserByUsernameOrEmail = async (email, username) => {
 
 exports.createNewUser = async ({ name, email, username, password, roles, user }) => {
   const query = `
-    INSERT INTO users (
+    INSERT INTO public.user (
       name,
       email,
       username,
@@ -56,6 +56,7 @@ exports.fetchUsers = async () => {
       roles,
       created_by,
       created_datetime
+    FROM public.user
     WHERE is_deleted = FALSE;
   `;
   const users = await runQuery(query);
@@ -67,6 +68,7 @@ exports.fetchUserById = async (userId) => {
     SELECT
       id,
       roles
+    FROM public.user
     WHERE id = $1 AND is_deleted = FALSE;
   `;
   const user = await runQuery(query, [userId]);
@@ -79,7 +81,7 @@ exports.fetchUserById = async (userId) => {
 
 exports.updateUser = async ({ name, email, password, roles, user, userId }) => {
   const query = `
-    UPDATE users SET
+    UPDATE public.user SET
       name = CASE
           WHEN $1 IS NOT NULL THEN $1
           ELSE name
@@ -121,7 +123,7 @@ exports.updateUser = async ({ name, email, password, roles, user, userId }) => {
 
 exports.deleteUser = async (userId) => {
   const query = `
-    UPDATE users SET
+    UPDATE public.user SET
       is_deleted = TRUE
     WHERE id = $1 AND is_deleted = FALSE;
   `;

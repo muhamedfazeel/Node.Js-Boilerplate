@@ -9,7 +9,7 @@ router.post(
   userController.login
 );
 router.post(
-  'register',
+  '/register',
   requestBodyValidator(newUserSchema),
   userController.registerUser
 );
