@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+    nodejs-db:
+        container_name: nodejs-db
+        image: postgres:14.1-alpine
+        ports:
+            - ${DB_PORT}:5432
+        expose:
+            - ${DB_PORT}
+        environment:
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASS}
+            POSTGRES_DB: ${DB_NAME}
+        volumes:
+            - ./apps/db/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+            - ./postgres-data:/var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD', 'pg_isready', '-d', '${DB_NAME}', '-U', '${DB_USER}']
+            start_period: 1s0s
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        networks:
+            - nodejs
+
+    web:
+        container_name: node-web
+        build: .
+        image: nodejs:latest
+        ports:
+            - '5500:3000'
+        networks:
+            - nodejs
+        environment:
+            - DB_HOST=${DB_HOST}
+            - DB_PORT=${DB_PORT}
+            - DB_USER=${DB_USER}
+            - DB_PASSWORD=${DB_PASS}
+            - DB_NAME=${DB_NAME}
+        expose:
+            - 3000
+        depends_on:
+            nodejs-db:
+                condition: service_healthy
+        command: |
+            npm run start
+
+networks:
+    nodejs:
