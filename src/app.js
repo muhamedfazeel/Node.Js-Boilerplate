@@ -35,7 +35,7 @@ app.use(limiter); // API Rate limiting
 
 app.use(logResponse);
 
-app.use(router);
+app.use('/v1', router);
 
 // 404 Handler Middleware
 app.use(error404);
