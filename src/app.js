@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-const { logRequest, logResponse } = require('./utils/communicationLogger');
+const responseLogger = require('./utils/responseLogger');
 const router = require('./routes/routes');
 const { error404 } = require('./middlewares/404');
 const { errorHandler } = require('./middlewares/errorHandler');
@@ -13,7 +13,6 @@ const limiter = rateLimit({
     message: 'Too many requests, please try again later',
 });
 
-app.use(logRequest);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // CORS
@@ -33,7 +32,7 @@ app.use(helmet()); // For preventing XSS and Click-jacking
 
 app.use(limiter); // API Rate limiting
 
-app.use(logResponse);
+app.use(responseLogger);
 
 app.use('/v1', router);
 
