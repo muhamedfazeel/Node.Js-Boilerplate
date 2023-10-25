@@ -1,6 +1,21 @@
 const { logger } = require('./logger');
 
-module.exports = (req, res, next) => {
+module.exports.logRequest = (req, res, next) => {
+    const { method, originalUrl, cookies, path, protocol } = req;
+
+    logger.info(`	
+    ----------------------- Request received -----------------------	
+    Method: ${method}	
+    URL: ${originalUrl}	
+    Path: ${path}
+    Protocol: ${protocol}
+    Cookies: ${JSON.stringify(cookies, {}, 2)}
+    ------------------------ End of Request ------------------------	
+`);
+    next();
+};
+
+module.exports.logResponse = (req, res, next) => {
     const originalSend = res.send;
 
     // Override the res.send method to capture the response data
