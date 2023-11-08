@@ -13,16 +13,16 @@ const {
 } = process.env;
 
 const config = {
-  project: PROJECT,
-  port: PORT,
-  serverEnv: SERVER_ENV,
-  dbUser: DB_USER,
-  dbHost: DB_HOST,
-  dbName: DB_NAME,
-  dbPass: DB_PASS,
-  dbPort: DB_PORT,
-  secret: SECRET,
-  saltRounds: SALT_ROUNDS
+  project: PROJECT || 'Node',
+  port: PORT || 3355,
+  serverEnv: SERVER_ENV || 'DEVELOPMENT',
+  dbUser: DB_USER || 'postgres',
+  dbHost: DB_HOST || 'postgres',
+  dbName: DB_NAME || 'postgres',
+  dbPass: DB_PASS || 'pass',
+  dbPort: DB_PORT || 5432,
+  secret: SECRET || 'S3cr3t',
+  saltRounds: SALT_ROUNDS || 5
 };
 
 module.exports = config;
