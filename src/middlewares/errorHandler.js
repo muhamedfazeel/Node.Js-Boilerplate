@@ -1,4 +1,4 @@
-const { INTERNAL_SERVER_ERROR_MSG } = require('../utils/constants');
+const { INTERNAL_SERVER_ERROR_MSG } = require('../utils/messages');
 const { AppError } = require('../utils/errorHandler');
 const { HTTP_INTERNAL_SERVER_ERROR } = require('../utils/httpStatusCodes');
 
