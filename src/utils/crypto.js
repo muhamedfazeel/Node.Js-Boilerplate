@@ -2,18 +2,18 @@ const {
   hashSync,
   compareSync
 } = require('bcrypt');
-const { SALT_ROUNDS } = require('./constants');
 const { HTTP_BAD_REQUEST, HTTP_EXPECTATION_FAILED } = require('./httpStatusCodes');
 const { AppError } = require('./errorHandler');
 const { logger } = require('./logger');
 const { DEFAULT_ERR_MSG } = require('./responseMessages');
+const config = require('../config/config');
 
 module.exports.encrypt = (password) => {
   try {
-    return hashSync(password, SALT_ROUNDS);
+    return hashSync(password, config.saltRounds);
   } catch (error) {
     logger.error(error.message || 'Hashing Failed', HTTP_EXPECTATION_FAILED);
-    new AppError(DEFAULT_ERR_MSG, HTTP_EXPECTATION_FAILED);
+    throw new AppError(DEFAULT_ERR_MSG, HTTP_EXPECTATION_FAILED);
   }
 };
 
@@ -27,7 +27,7 @@ module.exports.decodePassword = async (encodedPassword) => {
     return decodedPassword;
   } catch (error) {
     logger.error(error);
-    new AppError(
+    throw new AppError(
       'Invalid string provided',
       HTTP_BAD_REQUEST
     );
