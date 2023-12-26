@@ -12,7 +12,7 @@ services:
             POSTGRES_PASSWORD: ${DB_PASS}
             POSTGRES_DB: ${DB_NAME}
         volumes:
-            - ./apps/db/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+            - ./db/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
             - ./postgres-data:/var/lib/postgresql/data
         healthcheck:
             test: ['CMD', 'pg_isready', '-d', '${DB_NAME}', '-U', '${DB_USER}']
@@ -23,27 +23,27 @@ services:
         networks:
             - nodejs
 
-    web:
-        container_name: node-web
-        build: .
-        image: nodejs:latest
-        ports:
-            - '5500:3000'
-        networks:
-            - nodejs
-        environment:
-            - DB_HOST=${DB_HOST}
-            - DB_PORT=${DB_PORT}
-            - DB_USER=${DB_USER}
-            - DB_PASSWORD=${DB_PASS}
-            - DB_NAME=${DB_NAME}
-        expose:
-            - 3000
-        depends_on:
-            nodejs-db:
-                condition: service_healthy
-        command: |
-            npm run start
+    # node-be:
+    #     container_name: node-be
+    #     build: .
+    #     image: nodejs:20-alpine
+    #     ports:
+    #         - ${PORT}:${PORT}
+    #     networks:
+    #         - nodejs
+    #     environment:
+    #         - DB_HOST=${DB_HOST}
+    #         - DB_PORT=${DB_PORT}
+    #         - DB_USER=${DB_USER}
+    #         - DB_PASSWORD=${DB_PASS}
+    #         - DB_NAME=${DB_NAME}
+    #     expose:
+    #         - 3000
+    #     depends_on:
+    #         nodejs-db:
+    #             condition: service_healthy
+    #     command: |
+    #         npm start
 
 networks:
     nodejs:
