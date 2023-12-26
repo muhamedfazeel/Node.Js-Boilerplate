@@ -1,37 +1,48 @@
-const {
-  HTTP_OK,
-  HTTP_CREATED
-} = require('../../utils/httpStatusCodes');
-const { CREATED_MESSAGE, UPDATED_MESSAGE, DELETED_MESSAGE } = require('../../utils/responseMessages');
 const userService = require('./userService');
+const { logger } = require('../../utils/logger');
+const { HTTP_OK, HTTP_CREATED } = require('../../utils/httpStatusCodes');
+const { CREATED_MESSAGE, UPDATED_MESSAGE, DELETED_MESSAGE } = require('../../utils/responseMessages');
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   const {
     email,
     username,
     password
   } = req.body;
-  const user = await userService.login(email, username, password);
-  res.status(HTTP_OK).json(user);
+  try {
+    const response = await userService.login(email, username, password);
+    if (response?.error) {
+      throw response.error;
+    }
+    res.status(HTTP_OK).json({ message: 'Logged in successfully', data: response });
+  } catch (error) {
+    logger.error(error);
+    next(error);
+  }
 };
 
-exports.registerUser = async (req, res) => {
+exports.registerUser = async (req, res, next) => {
   const {
     name,
     email,
     username,
     password
   } = req.body;
-  const userId = await userService
-    .userSignup({
-      name,
-      email,
-      username,
-      password,
-      user: req.userId
-    });
-  if (userId) {
-    res.status(HTTP_CREATED).json({ message: CREATED_MESSAGE });
+
+  try {
+    const response = await userService
+      .userSignup({
+        name,
+        email,
+        username,
+        password
+      });
+    if (response?.userId) {
+      res.status(HTTP_CREATED).json({ message: CREATED_MESSAGE });
+    }
+  } catch (error) {
+    logger.error(error.message);
+    next(error);
   }
 };
 

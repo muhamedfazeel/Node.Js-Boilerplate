@@ -2,41 +2,45 @@ const { decodePassword, compare, encrypt } = require('../../utils/crypto');
 const userRepo = require('./userRepo');
 const {
   generateToken
-} = require('../../auth/jwt');
+} = require('../../jwt/jwt');
 const { logger } = require('../../utils/logger');
 const { AppError } = require('../../utils/errorHandler');
 const { HTTP_UNAUTHORIZED, HTTP_EXPECTATION_FAILED } = require('../../utils/httpStatusCodes');
-const { INVALID_USERNAME_PASSWORD_ERR_MSG } = require('../../utils/responseMessages');
+const { INVALID_USERNAME_PASSWORD_ERR_MSG, USER_ALREADY_EXISTS } = require('../../utils/responseMessages');
 
 exports.login = async (email, username, password) => {
-  try {
-    const user = await userRepo.getUserByUsernameOrEmail(email, username);
-    if (user) {
-      password = decodePassword(password);
-      const isValid = compare(password, user.password);
-      if (isValid) {
-        const token = generateToken({
-          username,
-          name: user.name,
-          userId: user.id
-        });
-        logger.info(
-          `Token for the user: ${user.username}`,
-          token
-        );
-      } else {
-        invalidUsernamePassword();
-      }
+  const user = await userRepo.getUserByUsernameOrEmail(email, username);
+  if (user) {
+    password = decodePassword(password);
+    const isValid = compare(password, user.password);
+    if (isValid) {
+      const token = generateToken({
+        username,
+        name: user.name,
+        userId: user.id
+      });
+      logger.info(
+        `Token for the user: ${user.username}`,
+        token
+      );
     } else {
-      invalidUsernamePassword();
+      return invalidUsernamePassword;
     }
-  } catch (error) {
-    logger.error(error);
-    throw new Error(error);
+  } else {
+    return invalidUsernamePassword;
   }
 };
 
-exports.userSignup = async ({ name, email, username, password, roles, user }) => {
+exports.userSignup = async ({ name, email, username, password }) => {
+  const user = await userRepo.getUserByUsernameOrEmail(username, email);
+  if (user) {
+    return {
+      error: new AppError(
+        USER_ALREADY_EXISTS,
+        HTTP_EXPECTATION_FAILED
+      )
+    };
+  }
   password = decodePassword(password);
   const encryptedPassword = encrypt(password);
   const userId = await userRepo.createNewUser({
@@ -44,16 +48,16 @@ exports.userSignup = async ({ name, email, username, password, roles, user }) =>
     email,
     username,
     password: encryptedPassword,
-    roles,
-    user
   });
   if (userId) {
     return userId;
   } else {
-    new AppError(
-      'Failed to create new user',
-      HTTP_EXPECTATION_FAILED
-    );
+    return {
+      error: new AppError(
+        'Failed to create new user',
+        HTTP_EXPECTATION_FAILED
+      )
+    };
   }
 };
 
@@ -80,7 +84,7 @@ exports.updateUser = async ({ name, email, password, roles, user, userId }) => {
   if (id) {
     return id;
   } else {
-    new AppError(
+    throw new AppError(
       'Failed to update the user',
       HTTP_EXPECTATION_FAILED
     );
@@ -94,16 +98,13 @@ exports.deleteUser = async (userId) => {
   if (row) {
     return row;
   } else {
-    new AppError(
+    throw new AppError(
       'Failed to update the user',
       HTTP_EXPECTATION_FAILED
     );
   }
 };
 
-const invalidUsernamePassword = () => {
-  new AppError(
-    INVALID_USERNAME_PASSWORD_ERR_MSG,
-    HTTP_UNAUTHORIZED
-  );
+const invalidUsernamePassword = {
+  error: new AppError(INVALID_USERNAME_PASSWORD_ERR_MSG, HTTP_UNAUTHORIZED)
 };

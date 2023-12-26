@@ -10,7 +10,7 @@ exports.getUserByUsernameOrEmail = async (email, username) => {
       email,
       username,
       password
-    FROM public.user
+    FROM node.user
     WHERE email = $1 OR username = $2 AND is_deleted = FALSE;
   `;
   const result = await runQuery(
@@ -22,7 +22,7 @@ exports.getUserByUsernameOrEmail = async (email, username) => {
 
 exports.createNewUser = async ({ name, email, username, password, roles, user }) => {
   const query = `
-    INSERT INTO public.user (
+    INSERT INTO node.user (
       name,
       email,
       username,
@@ -56,7 +56,7 @@ exports.fetchUsers = async () => {
       roles,
       created_by,
       created_datetime
-    FROM public.user
+    FROM node.user
     WHERE is_deleted = FALSE;
   `;
   const users = await runQuery(query);
@@ -68,7 +68,7 @@ exports.fetchUserById = async (userId) => {
     SELECT
       id,
       roles
-    FROM public.user
+    FROM node.user
     WHERE id = $1 AND is_deleted = FALSE;
   `;
   const user = await runQuery(query, [userId]);
@@ -81,7 +81,7 @@ exports.fetchUserById = async (userId) => {
 
 exports.updateUser = async ({ name, email, password, roles, user, userId }) => {
   const query = `
-    UPDATE public.user SET
+    UPDATE node.user SET
       name = CASE
           WHEN $1 IS NOT NULL THEN $1
           ELSE name
@@ -123,7 +123,7 @@ exports.updateUser = async ({ name, email, password, roles, user, userId }) => {
 
 exports.deleteUser = async (userId) => {
   const query = `
-    UPDATE public.user SET
+    UPDATE node.user SET
       is_deleted = TRUE
     WHERE id = $1 AND is_deleted = FALSE;
   `;
@@ -136,5 +136,5 @@ exports.deleteUser = async (userId) => {
 };
 
 const userNotFoundError = () => {
-  new AppError('User not found', HTTP_NOT_FOUND);
+  throw new AppError('User not found', HTTP_NOT_FOUND);
 };
