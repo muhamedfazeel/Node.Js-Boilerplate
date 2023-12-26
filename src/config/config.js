@@ -1,4 +1,3 @@
-require('dotenv').config();
 const {
   PROJECT,
   PORT,
@@ -16,11 +15,13 @@ const config = {
   project: PROJECT || 'Node',
   port: PORT || 3355,
   serverEnv: SERVER_ENV || 'DEVELOPMENT',
-  dbUser: DB_USER || 'postgres',
-  dbHost: DB_HOST || 'postgres',
-  dbName: DB_NAME || 'postgres',
-  dbPass: DB_PASS || 'pass',
-  dbPort: DB_PORT || 5432,
+  db: {
+    user: DB_USER || 'postgres',
+    host: DB_HOST || 'postgres',
+    name: DB_NAME || 'postgres',
+    pass: DB_PASS || 'pass',
+    port: DB_PORT || 5432,
+  },
   secret: SECRET || 'S3cr3t',
   saltRounds: SALT_ROUNDS || 5
 };
